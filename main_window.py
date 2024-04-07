@@ -83,7 +83,7 @@ class MainWindow:
         channel_name = simpledialog.askstring("Join Channel", "Enter channel name:")
         if channel_name:
             self.controller.join_channel(channel_name)
-            self.controller.channel_windows[channel_name] = ChannelWindow(self.controller, channel_name)
+            # self.controller.channel_windows[channel_name] = ChannelWindow(self.controller, channel_name)
 
     def save_config(self, server, port, nickname):
         # Save the connection info to a JSON file

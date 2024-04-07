@@ -26,9 +26,13 @@ class ClientController:
 
     def join_channel(self, channel):
         # Create a new channel window
-        self.channel_windows[channel] = ChannelWindow(self, channel)
         self.send_message("JOIN "+ channel)
-        self.channel_windows[channel].show()
+        # self.channel_windows[channel] = ChannelWindow(self, channel)
+        # self.channel_windows[channel].show()
+
+    def join_channel_async(self, channel):
+        self.channel_windows[channel] = ChannelWindow(self, channel) 
+        self.main_window.window.after(0, self.channel_windows[channel].show)
 
     def handle_user_input(self, input, channel=None):
         if self.server_interface is None:       # send error message back
@@ -42,9 +46,9 @@ class ClientController:
 
     def handle_user_command(self, command):
         # Split the command into the command name and arguments
-        parts = command[1:].split(" ")
-        command_name = parts[0]
-        command_args = parts[1:]
+        parts = command[1:].split(" ",1)
+        command_name = parts[0].upper()
+        command_args = parts[1] if len(parts) > 1 else ""
 
         if command_name not in self.VALID_COMMANDS:
             self.main_window.display_message("Invalid command: " + command)
@@ -59,17 +63,35 @@ class ClientController:
         self.server_interface.send_message(message)
 
     def handle_server_message(self, line):
-        if 'PRIVMSG #' in line:
+        if ' PRIVMSG ' in line:
             # Parse the line to determine its type and content
             sender, channel, message = self.parse_channel_message(line)
-            self.channel_windows[channel].display_message(message, sender)
-            # self.send_message(message, channel)
+
+            print(line)
+            print( sender,channel,message, (channel in self.channel_windows))
+
+            if channel == self.server_interface.nickname:
+                channel = sender
+            # Check if the channel window exists
+            if channel in self.channel_windows:
+                self.channel_windows[channel].display_message(message, sender)
+            else:
+                # Handle the case where the channel window doesn't exist
+                # For example, you might want to create a new channel window
+                self.channel_windows[channel] = ChannelWindow(self, channel)
+                # Schedule the show and display_message methods to be run in the main thread
+                self.main_window.window.after(0, self.channel_windows[channel].show)
+                self.main_window.window.after(0, self.channel_windows[channel].display_message, message, sender)
         elif 'PING' in line:
             ping_message = line.split(":", 1)[1] 
             self.server_interface.send_message(f"PONG :{ping_message}")
+        elif 'JOIN' in line:
+            channel_name = line.split(" JOIN ", 1)[1]
+            self.join_channel_async(channel_name)
         else:
             message_type, content = self.parse_server_message(line)
             self.main_window.display_message(content)
+ 
 
     def parse_server_message(self, line):
             return 'server', line               #TO DO
