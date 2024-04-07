@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import simpledialog
 import json 
 from datetime import datetime
+import os
 
 class MainWindow:
     def __init__(self, controller):
@@ -47,12 +48,12 @@ class MainWindow:
         # Start the Tkinter event loop
         self.window.mainloop()
 
-    def connect_to_server_dialog(self):
+    def connect_to_server_dialog(self): 
          # Load the connection info from the config file
         try:
-            with open('config.json', 'r') as f:
+            with open('./client/config.json', 'r') as f:
                 config = json.load(f)
-        except FileNotFoundError:
+        except FileNotFoundError: 
             config = {'server': '', 'port': '', 'nickname': ''}
 
         # Create a new Toplevel window

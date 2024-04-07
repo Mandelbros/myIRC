@@ -1,19 +1,27 @@
 import socket
-import threading
+import threading 
+import ssl
 
 class ServerInterface:
-    def __init__(self, server, port, nickname, message_callback):
+    def __init__(self, server, port, nickname, message_callback, use_ssl=False):
         self.server = server
         self.port = port
         self.nickname = nickname
         self.connected = False
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.receiving_thread = None
-        self.message_callback = message_callback
+        self.message_callback = message_callback 
+        self.use_ssl = use_ssl 
 
     def connect(self, nickname, username, realname):
         # Connect to the server
         self.socket.connect((self.server, self.port))
+        if self.use_ssl:
+            # Create a new SSL context with a specific SSL/TLS version and cipher suites
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)  # Use the highest protocol version that both client and server support
+            context.check_hostname = False
+            context.verify_mode = ssl.CERT_NONE  # Disable certificate verification
+            self.socket = context.wrap_socket(self.socket, server_hostname=self.server)
         self.connected = True
 
         # Send the NICK and USER commands
@@ -26,6 +34,7 @@ class ServerInterface:
 
     def send_message(self, message):
         # Send a message to the server
+        print("interface send msg"+message)
         self.socket.send((message + "\r\n").encode('utf-8'))
 
     def fetch_server_messages(self):
@@ -47,15 +56,19 @@ class ServerInterface:
                 while "\r\n" in buffer:
                     line, buffer = buffer.split("\r\n", 1)
                     self.message_callback(line)
-            except:
-                print("Connection was aborted.")
-                # Add your code to handle the error here, e.g., reconnect to the server
+                    print(line)
+            except Exception as e:
+                print(f"Connection was aborted due to error: {e}")
                 break 
 
     
     def stop(self):
         # Set connected to False
         self.connected = False
-        self.send_message("QUIT")
-        # Disconnect from the server
-        self.socket.close()
+        if self.socket.fileno() != -1:
+            # Send a message to the server
+            self.send_message("QUIT")   
+            self.socket.close()
+        else:
+            print("Error: Attempted to send a message on a closed socket.")
+        

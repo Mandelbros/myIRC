@@ -17,12 +17,12 @@ class ClientController:
 
     def connect_to_server(self, server, port, nickname):
         # Create the server interface
-        self.server_interface = ServerInterface(server, port, nickname, self.handle_server_message)
+        self.server_interface = ServerInterface(server, port, nickname, self.handle_server_message, True)
         try: 
-            self.server_interface.connect(nickname, nickname, nickname)
+            self.server_interface.connect(nickname, nickname, nickname) 
             self.user_nick = nickname
         except Exception as e:
-            self.main_window.display_message("Connection Error: ", str(e))
+            self.main_window.display_message("Connection Error: " + str(e))
 
     def join_channel(self, channel):
         # Create a new channel window
@@ -30,11 +30,13 @@ class ClientController:
         # self.chat_windows[channel] = ChatWindow(self, channel)
         # self.chat_windows[channel].show()
 
-    def join_channel_async(self, channel): 
+    def join_channel_async(self, channel, callback=None): 
         self.chat_windows[channel] = ChatWindow(self, channel) 
         # self.chat_windows[channel].show()
         self.main_window.window.after(0, self.chat_windows[channel].show)
         self.main_window.window.after(0, self.chat_windows[channel].display_message, "- now you are talking in "+channel)
+        if callback is not None:
+            callback()
 
     def handle_user_input(self, input, channel=None):
         if self.server_interface is None:       # send error message back
@@ -66,8 +68,7 @@ class ClientController:
 
     def handle_server_message(self, line): 
         if ' PRIVMSG ' in line:
-            # Parse the line to determine its type and content
-            # print(line)
+            # Parse the line to determine its type and content 
             sender, channel, message = self.parse_channel_message(line)
 
             if channel == self.server_interface.nickname:
@@ -77,9 +78,7 @@ class ClientController:
                 self.chat_windows[channel].display_message(message, sender)
             else:
                 # Handle the case where the channel window doesn't exist
-                # For example, you might want to create a new channel window
-                self.join_channel_async(channel)
-                self.main_window.window.after(0, self.chat_windows[channel].display_message, message, sender)
+                self.join_channel_async(channel, callback=lambda: self.chat_windows[channel].display_message(message, sender))
         elif 'PING' in line:
             ping_message = line.split(":", 1)[1] 
             self.server_interface.send_message(f"PONG :{ping_message}")
@@ -97,10 +96,9 @@ class ClientController:
             guest,channel = line.split(f"{self.user_nick} ", 1)[1].split(" ", 1)
             formatted_msg = f"You have invited <{guest}> to join {channel}"
             self.main_window.display_message(formatted_msg)
-        elif ' JOIN ' in line:
-            # print("join in handle server msg", line)
+        elif ' JOIN ' in line: 
             user_joined = line.split("!",1)[0][1:]
-            channel_name = line.split(" JOIN ", 1)[1]
+            channel_name = line.split(" JOIN ", 1)[1][1:]
 
             if  user_joined == self.user_nick:
                 self.join_channel_async(channel_name)

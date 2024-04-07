@@ -39,7 +39,7 @@ class ChatWindow:
 
     def send_message(self, event):
         # Get the message from the entry widget and send it to the controller
-        message = self.entry_widget.get()
+        message = self.entry_widget.get() 
         self.controller.send_message(message, self.name)
         self.display_message(message, self.controller.user_nick)
 
@@ -63,5 +63,9 @@ class ChatWindow:
 
     def on_close(self):
         # Remove this ChannelWindow from the chat_windows dictionary
-        if self.name in self.controller.chat_windows:
+        if self.name in self.controller.chat_windows and '#' in self.name :
             self.controller.handle_user_command("/PART "+self.name) 
+        elif self.name in self.controller.chat_windows and '#' not in self.name :
+            self.controller.remove_channel_window(self.name)
+        else:
+            self.window.destroy()
