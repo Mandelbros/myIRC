@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import simpledialog
-import json
-from channel_window import ChannelWindow
+import json 
+from datetime import datetime
 
 class MainWindow:
     def __init__(self, controller):
@@ -27,6 +27,8 @@ class MainWindow:
         self.server_messages = tk.Text(self.window)
         self.server_messages.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         self.server_messages.tag_configure('red', foreground='red')
+        self.server_messages.tag_configure('timestamp', foreground='blue')
+
 
         self.scrollbar = tk.Scrollbar(self.server_messages)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -87,7 +89,7 @@ class MainWindow:
         channel_name = simpledialog.askstring("Join Channel", "Enter channel name:")
         if channel_name:
             self.controller.join_channel(channel_name)
-            # self.controller.channel_windows[channel_name] = ChannelWindow(self.controller, channel_name)
+            # self.controller.chat_windows[channel_name] = ChatWindow(self.controller, channel_name)
 
     def save_config(self, server, port, nickname):
         # Save the connection info to a JSON file
@@ -105,6 +107,11 @@ class MainWindow:
         self.user_input.delete(0, tk.END)
 
     def display_message(self, message):
+        current_time = datetime.now().strftime('%H:%M:%S')
+        # Prepend the timestamp to the message
+        current_time = "[{}]* ".format(current_time)
+        self.server_messages.insert(tk.END, current_time, 'timestamp')
+
         if message.startswith("NOTICE from"):
             user = message.split(":", 1)[0] + ":"
             msg = message.split(":", 1)[1]

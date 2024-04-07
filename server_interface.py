@@ -31,25 +31,31 @@ class ServerInterface:
     def fetch_server_messages(self):
         buffer = ""
         while self.connected:
-            raw_data = self.socket.recv(2048)
-            start = 0
-            while start < len(raw_data):
-                try:
-                    # Try to decode a chunk of data
-                    chunk = raw_data[start:start+1024].decode('utf-8')
-                    buffer += chunk
-                    start += 1024
-                except UnicodeDecodeError:
-                    # If a UnicodeDecodeError occurs, skip to the next chunk
-                    start += 1024
+            try:
+                raw_data = self.socket.recv(2048)
+                start = 0
+                while start < len(raw_data):
+                    try:
+                        # Try to decode a chunk of data
+                        chunk = raw_data[start:start+1024].decode('utf-8')
+                        buffer += chunk
+                        start += 1024
+                    except UnicodeDecodeError:
+                        # If a UnicodeDecodeError occurs, skip to the next chunk
+                        start += 1024
 
-            while "\r\n" in buffer:
-                line, buffer = buffer.split("\r\n", 1)
-                self.message_callback(line)
+                while "\r\n" in buffer:
+                    line, buffer = buffer.split("\r\n", 1)
+                    self.message_callback(line)
+            except:
+                print("Connection was aborted.")
+                # Add your code to handle the error here, e.g., reconnect to the server
+                break 
+
     
     def stop(self):
         # Set connected to False
         self.connected = False
-        
+        self.send_message("QUIT")
         # Disconnect from the server
         self.socket.close()
