@@ -49,7 +49,7 @@ class Server:
                     if channel_name in self.channels:
                         for user in self.channels[channel_name]:
                             if user != user_name:
-                                self.users[user].sendall(f"{user_name}: {message}\n".encode())
+                                self.users[user].sendall(f"{user_name}: {message}\n".encode('utf-8'))
                 elif command == "QUIT":
                     if user_name:
                         for channel in self.channels.values():
