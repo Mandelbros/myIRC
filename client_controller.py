@@ -67,9 +67,6 @@ class ClientController:
             # Parse the line to determine its type and content
             sender, channel, message = self.parse_channel_message(line)
 
-            print(line)
-            print( sender,channel,message, (channel in self.channel_windows))
-
             if channel == self.server_interface.nickname:
                 channel = sender
             # Check if the channel window exists
@@ -88,10 +85,12 @@ class ClientController:
             user = line.split("!", 1)[0][1:]
             formatted_msg = f"NOTICE from {user}: {msg}"
             self.main_window.display_message(formatted_msg)
-
         elif 'JOIN' in line:
             channel_name = line.split(" JOIN ", 1)[1]
             self.join_channel_async(channel_name)
+        elif ' PART ' in line:
+            channel_name = line.split(" PART ", 1)[1]
+            self.channel_windows[channel_name].window.destroy()
         else:
             message_type, content = self.parse_server_message(line)
             self.main_window.display_message(content)
@@ -111,3 +110,12 @@ class ClientController:
             return sender, channel, message
         else:
             return 'server', line
+        
+    def stop(self):
+        # Stop the server interface
+        if self.server_interface is not None:
+            self.server_interface.stop()  # replace with your method to stop the server interface
+
+        # Close all channel windows
+        for channel_window in self.channel_windows.values():
+            channel_window.close()  # replace with your method to close a channel window

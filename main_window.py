@@ -37,6 +37,9 @@ class MainWindow:
         self.user_input = tk.Entry(self.window)
         self.user_input.pack(side=tk.BOTTOM, fill=tk.X)
         self.user_input.bind("<Return>", self.send_message)
+        
+        # Bind the window close event
+        self.window.protocol("WM_DELETE_WINDOW", self.on_close)
 
     def show(self):
         # Start the Tkinter event loop
@@ -110,4 +113,10 @@ class MainWindow:
         else:
             self.server_messages.insert(tk.END, message + "\n")
         self.server_messages.see(tk.END)
- 
+
+    def on_close(self):
+        # Stop the application
+        self.controller.stop()  # replace with your method to stop the application
+
+        # Destroy the window
+        self.window.destroy()

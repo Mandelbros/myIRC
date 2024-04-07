@@ -14,6 +14,7 @@ class ServerInterface:
     def connect(self, nickname, username, realname):
         # Connect to the server
         self.socket.connect((self.server, self.port))
+        self.connected = True
 
         # Send the NICK and USER commands
         self.send_message("NICK {}".format(nickname))
@@ -29,7 +30,7 @@ class ServerInterface:
 
     def fetch_server_messages(self):
         buffer = ""
-        while True:
+        while self.connected:
             raw_data = self.socket.recv(2048)
             start = 0
             while start < len(raw_data):
@@ -46,6 +47,9 @@ class ServerInterface:
                 line, buffer = buffer.split("\r\n", 1)
                 self.message_callback(line)
     
-    def disconnect(self):
+    def stop(self):
+        # Set connected to False
+        self.connected = False
+        
         # Disconnect from the server
         self.socket.close()
