@@ -78,13 +78,17 @@ class ClientController:
             else:
                 # Handle the case where the channel window doesn't exist
                 # For example, you might want to create a new channel window
-                self.channel_windows[channel] = ChannelWindow(self, channel)
-                # Schedule the show and display_message methods to be run in the main thread
-                self.main_window.window.after(0, self.channel_windows[channel].show)
+                self.join_channel_async(channel)
                 self.main_window.window.after(0, self.channel_windows[channel].display_message, message, sender)
         elif 'PING' in line:
             ping_message = line.split(":", 1)[1] 
             self.server_interface.send_message(f"PONG :{ping_message}")
+        elif 'NOTICE' in line:
+            msg = line.rsplit(":", 1)[1] 
+            user = line.split("!", 1)[0][1:]
+            formatted_msg = f"NOTICE from {user}: {msg}"
+            self.main_window.display_message(formatted_msg)
+
         elif 'JOIN' in line:
             channel_name = line.split(" JOIN ", 1)[1]
             self.join_channel_async(channel_name)

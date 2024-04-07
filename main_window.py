@@ -26,6 +26,7 @@ class MainWindow:
         # Create a text widget for displaying messages
         self.server_messages = tk.Text(self.window)
         self.server_messages.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        self.server_messages.tag_configure('red', foreground='red')
 
         self.scrollbar = tk.Scrollbar(self.server_messages)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -101,6 +102,12 @@ class MainWindow:
         self.user_input.delete(0, tk.END)
 
     def display_message(self, message):
-        # Display a message in the text widget
-        self.server_messages.insert(tk.END, message + "\n")
+        if message.startswith("NOTICE from"):
+            user = message.split(":", 1)[0] + ":"
+            msg = message.split(":", 1)[1]
+            self.server_messages.insert(tk.END, user, 'red')
+            self.server_messages.insert(tk.END, msg + "\n")
+        else:
+            self.server_messages.insert(tk.END, message + "\n")
+        self.server_messages.see(tk.END)
  
