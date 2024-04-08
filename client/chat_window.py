@@ -32,7 +32,6 @@ class ChatWindow:
         self.entry_widget.bind("<Return>", self.send_message)
         self.window.protocol("WM_DELETE_WINDOW", self.on_close)
 
-
     def show(self):
         # Start the Tkinter event loop
         self.window.mainloop()

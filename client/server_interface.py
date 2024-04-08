@@ -34,7 +34,6 @@ class ServerInterface:
 
     def send_message(self, message):
         # Send a message to the server
-        print("interface send msg"+message)
         self.socket.send((message + "\r\n").encode('utf-8'))
 
     def fetch_server_messages(self):
@@ -56,12 +55,11 @@ class ServerInterface:
                 while "\r\n" in buffer:
                     line, buffer = buffer.split("\r\n", 1)
                     self.message_callback(line)
-                    print(line)
+                    print(line) #debug
             except Exception as e:
                 print(f"Connection was aborted due to error: {e}")
                 break 
 
-    
     def stop(self):
         # Set connected to False
         self.connected = False
