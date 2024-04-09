@@ -24,11 +24,17 @@ class ClientController:
         except Exception as e:
             self.main_window.display_message("Connection Error: " + str(e))
 
+    def disconnect_from_server(self):
+        self.send_message("QUIT")
+
     def join_channel(self, channel):
         # Create a new channel window
         self.send_message("JOIN "+ channel)
         # self.chat_windows[channel] = ChatWindow(self, channel)
         # self.chat_windows[channel].show()
+
+    def part_channel(self, channel):
+        self.send_message("PART "+ channel)
 
     def join_channel_async(self, channel, callback=None): 
         self.chat_windows[channel] = ChatWindow(self, channel) 

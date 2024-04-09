@@ -20,19 +20,20 @@ class MainWindow:
         self.options_menu = tk.Menu(self.menu_bar, tearoff=0)
         self.options_menu.add_command(label="Connect", command=self.connect_to_server_dialog)
         self.options_menu.add_command(label="Join Channel", command=self.join_channel_dialog)
+        self.options_menu.add_command(label="Part Channel", command=self.part_channel_dialog)
         self.options_menu.add_command(label="Send Notice", command=self.send_notice_dialog)
         self.options_menu.add_command(label="Send Message", command=self.send_message_dialog)
+        self.options_menu.add_command(label="Quit IRC", command=self.disconnect_from_server)
         self.menu_bar.add_cascade(label="Options", menu=self.options_menu)
         self.window.config(menu=self.menu_bar)
 
-        # Create a scrollbar
         # Create a text widget for displaying messages
         self.server_messages = tk.Text(self.window)
         self.server_messages.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         self.server_messages.tag_configure('red', foreground='red')
         self.server_messages.tag_configure('timestamp', foreground='blue')
 
-
+        # Create a scrollbar
         self.scrollbar = tk.Scrollbar(self.server_messages)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.server_messages.config(yscrollcommand=self.scrollbar.set)
@@ -46,9 +47,14 @@ class MainWindow:
         # Bind the window close event
         self.window.protocol("WM_DELETE_WINDOW", self.on_close)
 
+
     def show(self):
+        self.connect_to_server_dialog()
         # Start the Tkinter event loop
         self.window.mainloop()
+
+    def disconnect_from_server(self):
+        self.controller.disconnect_from_server()
 
     def connect_to_server_dialog(self): 
         # Load the connection info from the config file
@@ -101,6 +107,12 @@ class MainWindow:
         channel_name = simpledialog.askstring("Join Channel", "Enter channel name:")
         if channel_name:
             self.controller.join_channel(channel_name)
+            # self.controller.chat_windows[channel_name] = ChatWindow(self.controller, channel_name)
+
+    def part_channel_dialog(self):
+        channel_name = simpledialog.askstring("Part Channel", "Enter channel name:")
+        if channel_name:
+            self.controller.part_channel(channel_name)
             # self.controller.chat_windows[channel_name] = ChatWindow(self.controller, channel_name)
 
     def send_notice_dialog(self):
