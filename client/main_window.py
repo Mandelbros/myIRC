@@ -20,6 +20,8 @@ class MainWindow:
         self.options_menu = tk.Menu(self.menu_bar, tearoff=0)
         self.options_menu.add_command(label="Connect", command=self.connect_to_server_dialog)
         self.options_menu.add_command(label="Join Channel", command=self.join_channel_dialog)
+        self.options_menu.add_command(label="Send Notice", command=self.send_notice_dialog)
+        self.options_menu.add_command(label="Send Message", command=self.send_message_dialog)
         self.menu_bar.add_cascade(label="Options", menu=self.options_menu)
         self.window.config(menu=self.menu_bar)
 
@@ -91,6 +93,58 @@ class MainWindow:
         if channel_name:
             self.controller.join_channel(channel_name)
             # self.controller.chat_windows[channel_name] = ChatWindow(self.controller, channel_name)
+
+    def send_notice_dialog(self):
+        # Create a new Toplevel window
+        dialog = tk.Toplevel(self.window)
+        dialog.title("Notice")
+        dialog.geometry("300x150")
+
+        # Create labels and entry fields for target and message
+        tk.Label(dialog, text="Target:").pack(side=tk.TOP)
+        target_entry = tk.Entry(dialog, width=40)
+        target_entry.pack(side=tk.TOP)
+
+        tk.Label(dialog, text="Message:").pack(side=tk.TOP)
+        message_entry = tk.Entry(dialog, width=40)
+        message_entry.pack(side=tk.TOP)
+
+        # Set the default values of the entry fields to the loaded notice info
+        target_entry.insert(0, '')
+        message_entry.insert(0, '')
+
+        # Create a send button
+        send_button = tk.Button(dialog, text="Send", command=lambda: [self.controller.send_notice(message_entry.get(), target_entry.get()), dialog.destroy()])
+        send_button.pack(side=tk.TOP)
+
+        # Make the dialog modal
+        dialog.grab_set()
+
+    def send_message_dialog(self):
+        # Create a new Toplevel window
+        dialog = tk.Toplevel(self.window)
+        dialog.title("Message")
+        dialog.geometry("350x150")
+
+        # Create labels and entry fields for target and message
+        tk.Label(dialog, text="Target:").pack(side=tk.TOP)
+        target_entry = tk.Entry(dialog, width=40)
+        target_entry.pack(side=tk.TOP)
+
+        tk.Label(dialog, text="Message:").pack(side=tk.TOP)
+        message_entry = tk.Entry(dialog, width=40)
+        message_entry.pack(side=tk.TOP)
+
+        # Set the default values of the entry fields to the loaded notice info
+        target_entry.insert(0, '')
+        message_entry.insert(0, '')
+
+        # Create a send button
+        send_button = tk.Button(dialog, text="Send", command=lambda: [self.controller.send_message(message_entry.get(), target_entry.get()), dialog.destroy()])
+        send_button.pack(side=tk.TOP)
+
+        # Make the dialog modal
+        dialog.grab_set()
 
     def save_config(self, server, port, nickname):
         # Save the connection info to a JSON file

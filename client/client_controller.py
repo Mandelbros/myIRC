@@ -66,6 +66,12 @@ class ClientController:
       
         self.server_interface.send_message(message)
 
+    def send_notice(self, message, target):
+        # Send a specific target
+        message = ("NOTICE {} :{}".format(target, message))
+            
+        self.server_interface.send_message(message)
+
     def handle_server_message(self, line): 
         if ' PRIVMSG ' in line:
             # Parse the line to determine its type and content 
