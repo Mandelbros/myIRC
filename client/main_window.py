@@ -51,7 +51,7 @@ class MainWindow:
         self.window.mainloop()
 
     def connect_to_server_dialog(self): 
-         # Load the connection info from the config file
+        # Load the connection info from the config file
         try:
             with open('./client/config.json', 'r') as f:
                 config = json.load(f)
@@ -81,8 +81,17 @@ class MainWindow:
         port_entry.insert(0, config['port'])
         nickname_entry.insert(0, config['nickname'])
 
+        # Create a Checkbox for SSL connection
+        use_ssl = tk.BooleanVar()
+        ssl_checkbox = tk.Checkbutton(dialog, text="Use SSL", variable=use_ssl)
+        ssl_checkbox.pack(side=tk.TOP)
+
         # Create a connect button
-        connect_button = tk.Button(dialog, text="Connect", command=lambda: [self.save_config(server_entry.get(), port_entry.get(), nickname_entry.get()), self.controller.connect_to_server(server_entry.get(), int(port_entry.get()), nickname_entry.get()), dialog.destroy()])
+        connect_button = tk.Button(dialog, text="Connect", command=lambda: [
+            self.save_config(server_entry.get(), port_entry.get(), nickname_entry.get()), 
+            self.controller.connect_to_server(server_entry.get(), int(port_entry.get()), nickname_entry.get(), use_ssl.get()), 
+            dialog.destroy()
+        ])
         connect_button.pack(side=tk.TOP)
 
         # Make the dialog modal

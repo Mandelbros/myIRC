@@ -15,9 +15,9 @@ class ClientController:
         self.main_window = MainWindow(self)
         self.main_window.show()
 
-    def connect_to_server(self, server, port, nickname):
+    def connect_to_server(self, server, port, nickname, use_ssl):
         # Create the server interface
-        self.server_interface = ServerInterface(server, port, nickname, self.handle_server_message, True)
+        self.server_interface = ServerInterface(server, port, nickname, self.handle_server_message, use_ssl)
         try: 
             self.server_interface.connect(nickname, nickname, nickname) 
             self.user_nick = nickname
