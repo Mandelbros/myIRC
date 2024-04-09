@@ -78,6 +78,26 @@ class ClientController:
             
         self.server_interface.send_message(message)
 
+    def whois_user(self, user):
+        message = ("WHOIS {}".format(user))
+            
+        self.server_interface.send_message(message)
+
+    def invite_user(self, user, channel):
+        message = ("INVITE {} {}".format(user, channel))
+            
+        self.server_interface.send_message(message)
+
+    def ban_user(self, user, channel):
+        message = ("BAN {} {}".format(user, channel)) # not like this
+            
+        self.server_interface.send_message(message)
+
+    def kick_user(self, user, channel):
+        message = ("KICK {} {}".format(channel, user))
+            
+        self.server_interface.send_message(message)
+
     def handle_server_message(self, line): 
         if ' PRIVMSG ' in line:
             # Parse the line to determine its type and content 

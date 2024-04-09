@@ -17,14 +17,23 @@ class MainWindow:
 
         # Create a menu bar
         self.menu_bar = tk.Menu(self.window)
-        self.options_menu = tk.Menu(self.menu_bar, tearoff=0)
-        self.options_menu.add_command(label="Connect", command=self.connect_to_server_dialog)
-        self.options_menu.add_command(label="Join Channel", command=self.join_channel_dialog)
-        self.options_menu.add_command(label="Part Channel", command=self.part_channel_dialog)
-        self.options_menu.add_command(label="Send Notice", command=self.send_notice_dialog)
-        self.options_menu.add_command(label="Send Message", command=self.send_message_dialog)
-        self.options_menu.add_command(label="Quit IRC", command=self.disconnect_from_server)
-        self.menu_bar.add_cascade(label="Options", menu=self.options_menu)
+
+        self.server_menu = tk.Menu(self.menu_bar, tearoff=0)
+        self.server_menu.add_command(label="Connect", command=self.connect_to_server_dialog)
+        self.server_menu.add_command(label="Disconnect", command=self.disconnect_from_server)
+        self.menu_bar.add_cascade(label="Server", menu=self.server_menu)
+
+        self.commands_menu = tk.Menu(self.menu_bar, tearoff=0)
+        self.commands_menu.add_command(label="Join channel", command=self.join_channel_dialog)
+        self.commands_menu.add_command(label="Part channel", command=self.part_channel_dialog)
+        self.commands_menu.add_command(label="Query user", command=self.send_message_dialog)
+        self.commands_menu.add_command(label="Send notice", command=self.send_notice_dialog)
+        self.commands_menu.add_command(label="Whois user", command=self.whois_user_dialog)
+        self.commands_menu.add_command(label="Invite user", command=self.invite_user_dialog)
+        # self.commands_menu.add_command(label="Ban user", command=self.ban_user_dialog)
+        self.commands_menu.add_command(label="Kick user", command=self.kick_user_dialog)
+        self.menu_bar.add_cascade(label="Commands", menu=self.commands_menu)
+
         self.window.config(menu=self.menu_bar)
 
         # Create a text widget for displaying messages
@@ -52,9 +61,6 @@ class MainWindow:
         self.connect_to_server_dialog()
         # Start the Tkinter event loop
         self.window.mainloop()
-
-    def disconnect_from_server(self):
-        self.controller.disconnect_from_server()
 
     def connect_to_server_dialog(self): 
         # Load the connection info from the config file
@@ -102,6 +108,9 @@ class MainWindow:
 
         # Make the dialog modal
         dialog.grab_set()
+
+    def disconnect_from_server(self):
+        self.controller.disconnect_from_server()
 
     def join_channel_dialog(self):
         channel_name = simpledialog.askstring("Join Channel", "Enter channel name:")
@@ -163,6 +172,88 @@ class MainWindow:
         # Create a send button
         send_button = tk.Button(dialog, text="Send", command=lambda: [self.controller.send_message(message_entry.get(), target_entry.get()), dialog.destroy()])
         send_button.pack(side=tk.TOP)
+
+        # Make the dialog modal
+        dialog.grab_set()
+
+    def whois_user_dialog(self):
+        user = simpledialog.askstring("Who is user", "Enter nickname:")
+        self.controller.whois_user(user)
+        
+    def invite_user_dialog(self):
+        # Create a new Toplevel window
+        dialog = tk.Toplevel(self.window)
+        dialog.title("Invite user to channel")
+        dialog.geometry("300x150")
+
+        # Create labels and entry fields for user and channel
+        tk.Label(dialog, text="User:").pack(side=tk.TOP)
+        user_entry = tk.Entry(dialog, width=40)
+        user_entry.pack(side=tk.TOP)
+
+        tk.Label(dialog, text="Channel:").pack(side=tk.TOP)
+        channel_entry = tk.Entry(dialog, width=40)
+        channel_entry.pack(side=tk.TOP)
+
+        # Set the default values of the entry fields to the loaded notice info
+        user_entry.insert(0, '')
+        channel_entry.insert(0, '')
+
+        # Create a invite button
+        invite_button = tk.Button(dialog, text="Invite", command=lambda: [self.controller.invite_user(user_entry.get(), channel_entry.get()), dialog.destroy()])
+        invite_button.pack(side=tk.TOP)
+
+        # Make the dialog modal
+        dialog.grab_set()
+    
+    def ban_user_dialog(self):
+        # Create a new Toplevel window
+        dialog = tk.Toplevel(self.window)
+        dialog.title("Ban user from channel")
+        dialog.geometry("300x150")
+
+        # Create labels and entry fields for user and channel
+        tk.Label(dialog, text="User:").pack(side=tk.TOP)
+        user_entry = tk.Entry(dialog, width=40)
+        user_entry.pack(side=tk.TOP)
+
+        tk.Label(dialog, text="Channel:").pack(side=tk.TOP)
+        channel_entry = tk.Entry(dialog, width=40)
+        channel_entry.pack(side=tk.TOP)
+
+        # Set the default values of the entry fields to the loaded notice info
+        user_entry.insert(0, '')
+        channel_entry.insert(0, '')
+
+        # Create a invite button
+        invite_button = tk.Button(dialog, text="Ban", command=lambda: [self.controller.ban_user(user_entry.get(), channel_entry.get()), dialog.destroy()])
+        invite_button.pack(side=tk.TOP)
+
+        # Make the dialog modal
+        dialog.grab_set()
+
+    def kick_user_dialog(self):
+        # Create a new Toplevel window
+        dialog = tk.Toplevel(self.window)
+        dialog.title("Kick user from channel")
+        dialog.geometry("300x150")
+
+        # Create labels and entry fields for user and channel
+        tk.Label(dialog, text="User:").pack(side=tk.TOP)
+        user_entry = tk.Entry(dialog, width=40)
+        user_entry.pack(side=tk.TOP)
+
+        tk.Label(dialog, text="Channel:").pack(side=tk.TOP)
+        channel_entry = tk.Entry(dialog, width=40)
+        channel_entry.pack(side=tk.TOP)
+
+        # Set the default values of the entry fields to the loaded notice info
+        user_entry.insert(0, '')
+        channel_entry.insert(0, '')
+
+        # Create a invite button
+        invite_button = tk.Button(dialog, text="Kick", command=lambda: [self.controller.kick_user(user_entry.get(), channel_entry.get()), dialog.destroy()])
+        invite_button.pack(side=tk.TOP)
 
         # Make the dialog modal
         dialog.grab_set()
