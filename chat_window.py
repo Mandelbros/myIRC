@@ -40,6 +40,7 @@ class ChatWindow:
         # Get the message from the entry widget and send it to the controller
         message = self.entry_widget.get() 
         self.controller.send_message(message, self.name)
+        # print("canal self.name "+ self.name)
         self.display_message(message, self.controller.user_nick)
 
         # Clear the entry widget

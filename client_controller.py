@@ -64,11 +64,13 @@ class ClientController:
             self.main_window.display_message("Invalid command: " + command)
             return 
         self.send_message(command_name + " " + command_args)
+        print("handle user command: " + command)
 
     def send_message(self, message, channel=None):
         # Send a message to the server or a specific channel
         if channel:
             message = ("PRIVMSG {} :{}".format(channel, message))
+            print(channel+" "+message)
       
         self.server_interface.send_message(message)
 
@@ -130,7 +132,7 @@ class ClientController:
             self.main_window.display_message(formatted_msg)
         elif ' JOIN ' in line: 
             user_joined = line.split("!",1)[0][1:]
-            channel_name = line.split(" JOIN ", 1)[1][1:]
+            channel_name = line.split(" JOIN ", 1)[1][1:]           #wdf
 
             if  user_joined == self.user_nick:
                 self.join_channel_async(channel_name)

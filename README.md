@@ -34,9 +34,5 @@ python main.py
 - Connect to an IRC server
 - Join multiple channels
 - Send and receive messages
-- Handle user commands
-
-## Future Improvements
-- Add support for private messages
-- Add error handling for server disconnections
-- Improve the user interface
+- Handle user commands 
+- Secure Conection through SSL
